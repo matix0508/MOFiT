@@ -1,10 +1,11 @@
+
 from re import sub
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 M = 1  # kg
-x_0 = 2.8  # m
+x_0 = 2.83228  # m
 v_0 = 0
 
 dx = 1e-3
@@ -15,19 +16,28 @@ def create_dir(path: str):
         os.makedirs(path)
 
 
-def plot(x: np.ndarray, y: np.ndarray, title: str = "", xlabel: str = "", ylabel: str = "", subdir: str = "other"):
-    plt.plot(x, y)
+def plot(x: Union[np.ndarray, List[np.ndarray]], y: Union[np.ndarray, List[np.ndarray]], title: str = "", xlabel: str = "", ylabel: str = "", subdir: str = "other", legend: list[str] = None):
+    if isinstance(x, list) and isinstance(y, list) and isinstance(legend, list):
+        for xi, yi, l in zip(x, y, legend):
+            # print((xi, yi, l))
+            plt.plot(xi, yi, label=l)
+    elif isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
+        plt.plot(x, y)
+    else:
+        raise Exception("Wrong type")
     if title:
         plt.title(title)
     if xlabel:
         plt.xlabel(xlabel)
     if ylabel:
         plt.ylabel(ylabel)
+
     plt.tight_layout()
     path = f"images/{subdir}"
     create_dir(path)
     plt.savefig(f"{path}/{title}.png")
     plt.show()
+
 
 
 def derivative(func, x0: float) -> float:
@@ -113,25 +123,14 @@ def euler(alpha: float, dt: float, range: float, first: bool = True, subdir: str
 
         )
         plot(
-            body.past_times,
-            body.Eks,
-            title=f"Ek(t), dt={dt}, alpha={alpha}, range={range}",
-            subdir=subdir
+            [body.past_times] * 3,
+            [body.Eks, body.Vs, body.Vs + body.Eks],
+            title=f"E(t), dt={dt}, alpha={alpha}, range={range}",
+            subdir=subdir,
+            legend=["Ek(t)", "V(t)", "Ec(t)"]
 
         )
-        plot(
-            body.past_times,
-            body.Vs,
-            title=f"V(t), dt={dt}, alpha={alpha}, range={range}",
-            subdir=subdir
 
-        )
-        plot(
-            body.past_times,
-            body.Vs + body.Eks,
-            title=f"Ec(t), dt={dt}, alpha={alpha}, range={range}",
-            subdir=subdir
-        )
     else:
         plot(
             body.past_positions,
