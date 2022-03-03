@@ -1,3 +1,4 @@
+from re import sub
 from typing import Tuple, Union
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,6 +8,7 @@ x_0 = 2.8  # m
 v_0 = 0
 
 dx = 1e-3
+
 
 def create_dir(path: str):
     if not os.path.exists(path):
@@ -66,6 +68,7 @@ class Body:
     def get_next_euler(self) -> Tuple[float, float]:
         return self.get_next_x_euler(), self.get_next_v_euler()
 
+
     def reset_data(self):
         self.x = self.x0
         self.v = self.v0
@@ -88,63 +91,79 @@ class Body:
         self.Vs = V(self.past_positions)
 
 
+
+
 def euler(alpha: float, dt: float, range: float, first: bool = True, subdir: str = "other"):
-    body_euler1 = Body(M, x_0, v_0, alpha=alpha, dt=dt)
-    body_euler1.calculate_euler(range=range)
+    body = Body(M, x_0, v_0, alpha=alpha, dt=dt)
+    body.calculate_euler(range=range)
     if first:
         plot(
-            body_euler1.past_times,
-            body_euler1.past_positions,
+            body.past_times,
+            body.past_positions,
             title=f"x(t), dt={dt}, alpha={alpha}, range={range}",
             subdir=subdir
 
         )
         plot(
-            body_euler1.past_times,
-            body_euler1.past_velocities,
+            body.past_times,
+            body.past_velocities,
             title=f"v(t), dt={dt}, alpha={alpha}, range={range}",
             subdir=subdir
 
 
         )
         plot(
-            body_euler1.past_times,
-            body_euler1.Eks,
+            body.past_times,
+            body.Eks,
             title=f"Ek(t), dt={dt}, alpha={alpha}, range={range}",
             subdir=subdir
 
         )
         plot(
-            body_euler1.past_times,
-            body_euler1.Vs,
+            body.past_times,
+            body.Vs,
             title=f"V(t), dt={dt}, alpha={alpha}, range={range}",
             subdir=subdir
 
         )
         plot(
-            body_euler1.past_times,
-            body_euler1.Vs + body_euler1.Eks,
+            body.past_times,
+            body.Vs + body.Eks,
             title=f"Ec(t), dt={dt}, alpha={alpha}, range={range}",
             subdir=subdir
         )
     else:
         plot(
-            body_euler1.past_positions,
-            body_euler1.past_velocities,
+            body.past_positions,
+            body.past_velocities,
             title=f"v(x), dt={dt}, alpha={alpha}, range={range}",
             subdir=subdir
         )
 
+def trapezoid(alpha: float, dt: float, range: int, first: bool = True, subdir: str = "other"):
+    body = Body(M, x_0, v_0, alpha, dt)
 
-def exercise1():
-    for dt in [0.01, 0.001]:
-        euler(alpha=0, dt=dt, range=30, subdir="ex1")
-        euler(alpha=0, dt=dt, range=100, first=False, subdir="ex1/")
-        euler(alpha=0, dt=dt, range=1000, first=False, subdir="ex1/")
+
+
+def exercise(method, alpha, dt, subdir):
+    method(alpha=alpha, dt=dt, range=30, subdir=subdir)
+    method(alpha=alpha, dt=dt, range=100, first=False, subdir=subdir)
+    method(alpha=alpha, dt=dt, range=1000, first=False, subdir=subdir)
+
+
+def exercise1(method=euler):
+    for i, dt in enumerate([0.01, 0.001]):
+        exercise(method, alpha=0, dt=dt, subdir=f"ex1/{i}")
+
+
+def exercise2(method=euler):
+    for i, alpha in enumerate([0.5, 5, 201]):
+        exercise(method, alpha, dt=0.01, subdir=f"ex2/{i}")
 
 
 def main():
     exercise1()
+    exercise2()
 
 
 if __name__ == "__main__":
