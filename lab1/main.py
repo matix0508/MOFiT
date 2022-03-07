@@ -1,6 +1,7 @@
 
 from re import sub
 from typing import Tuple, Union, List
+from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -10,34 +11,51 @@ v_0 = 0
 
 dx = 1e-3
 
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "sans-serif",
+    "font.sans-serif": ["Helvetica"]})
+
 
 def create_dir(path: str):
     if not os.path.exists(path):
         os.makedirs(path)
 
 
-def plot(x: Union[np.ndarray, List[np.ndarray]], y: Union[np.ndarray, List[np.ndarray]], title: str = "", xlabel: str = "", ylabel: str = "", subdir: str = "other", legend: list[str] = None):
+def plot(x: Union[np.ndarray, List[np.ndarray]], y: Union[np.ndarray, List[np.ndarray]], title: str = "", xlabel: str = "", ylabel: str = "", subdir: str = "other", legend: List[str] = None, ax=plt):
+    plt.cla()
     if isinstance(x, list) and isinstance(y, list) and isinstance(legend, list):
         for xi, yi, l in zip(x, y, legend):
             # print((xi, yi, l))
-            plt.plot(xi, yi, label=l)
+            ax.plot(xi, yi, label=l)
     elif isinstance(x, np.ndarray) and isinstance(y, np.ndarray):
-        plt.plot(x, y)
+        # print(ax)
+        ax.plot(x, y)
     else:
         raise Exception("Wrong type")
-    if title:
-        plt.title(title)
-    if xlabel:
-        plt.xlabel(xlabel)
-    if ylabel:
-        plt.ylabel(ylabel)
 
-    plt.tight_layout()
-    path = f"images/{subdir}"
-    create_dir(path)
-    plt.savefig(f"{path}/{title}.png")
-    plt.show()
+    if ax == plt:
 
+        if title:
+            plt.title(title)
+        if ylabel:
+            plt.ylabel(ylabel)
+
+        if xlabel:
+            plt.xlabel(xlabel)
+
+        plt.tight_layout()
+        path = f"images/{subdir}"
+        create_dir(path)
+        plt.savefig(f"{path}/{title}.png")
+        # plt.show()
+    else:
+        if legend:
+            ax.legend()
+        if title:
+            ax.set_title(title)
+        if ylabel:
+            ax.set_ylabel(ylabel)
 
 
 def derivative(func, x0: float) -> float:
@@ -78,7 +96,6 @@ class Body:
     def get_next_euler(self) -> Tuple[float, float]:
         return self.get_next_x_euler(), self.get_next_v_euler()
 
-
     def reset_data(self):
         self.x = self.x0
         self.v = self.v0
@@ -101,63 +118,76 @@ class Body:
         self.Vs = V(self.past_positions)
 
 
-
-
-def euler(alpha: float, dt: float, range: float, first: bool = True, subdir: str = "other"):
+def euler(alpha: float, dt: float, range: float, first: bool = True, subdir: str = "other", axph=plt):
     body = Body(M, x_0, v_0, alpha=alpha, dt=dt)
     body.calculate_euler(range=range)
     if first:
+        fig, [ax1, ax2, ax3] = plt.subplots(3, 1, sharex=True)
         plot(
             body.past_times,
             body.past_positions,
-            title=f"x(t), dt={dt}, alpha={alpha}, range={range}",
-            subdir=subdir
+            title=rf"$x(t)$, $\Delta t={dt}$, $\alpha={alpha}$ $(0,{range}s)$",
+            subdir=subdir,
+            ax=ax1
 
         )
         plot(
             body.past_times,
             body.past_velocities,
-            title=f"v(t), dt={dt}, alpha={alpha}, range={range}",
-            subdir=subdir
+            title=rf"$v(t)$, $\Delta t={dt}$, $\alpha={alpha}$ $(0,{range}s)$",
+            subdir=subdir,
+            ax=ax2
 
 
         )
         plot(
             [body.past_times] * 3,
             [body.Eks, body.Vs, body.Vs + body.Eks],
-            title=f"E(t), dt={dt}, alpha={alpha}, range={range}",
+            title=rf"$E(t)$, $\Delta t={dt}$, $\alpha={alpha}$ $(0,{range}s)$",
             subdir=subdir,
-            legend=["Ek(t)", "V(t)", "Ec(t)"]
-
+            legend=[r"$Ek(t)$", r"$V(t)$", r"$Ec(t)$"],
+            ax=ax3
         )
+        # fig.show()
+        # fig.legend()
+        create_dir("output")
+        fig.tight_layout()
+        fig.savefig(f"output/alpha {alpha} st {dt} range {range}.png")
 
     else:
         plot(
             body.past_positions,
             body.past_velocities,
-            title=f"v(x), dt={dt}, alpha={alpha}, range={range}",
-            subdir=subdir
+            title=rf"$v(x)$ $\Delta t={dt}$, $\alpha={alpha}$ ${range}s$",
+            subdir=subdir,
+            ax=axph
         )
+
 
 def trapezoid(alpha: float, dt: float, range: int, first: bool = True, subdir: str = "other"):
     body = Body(M, x_0, v_0, alpha, dt)
 
 
-
-def exercise(method, alpha, dt, subdir):
+def exercise(method, alpha, dt, subdir, ph: Axes=None):
     method(alpha=alpha, dt=dt, range=30, subdir=subdir)
-    method(alpha=alpha, dt=dt, range=100, first=False, subdir=subdir)
-    method(alpha=alpha, dt=dt, range=1000, first=False, subdir=subdir)
+    method(alpha=alpha, dt=dt, range=100, first=False, subdir=subdir, axph=ph[0])
+    method(alpha=alpha, dt=dt, range=1000, first=False, subdir=subdir, axph=ph[1])
 
 
 def exercise1(method=euler):
+    fig_ph, axs = plt.subplots(2, 2)
     for i, dt in enumerate([0.01, 0.001]):
-        exercise(method, alpha=0, dt=dt, subdir=f"ex1/{i}")
+        exercise(method, alpha=0, dt=dt, subdir=f"ex1/{i}", ph=axs[i])
+    fig_ph.tight_layout(pad=0.3)
+    fig_ph.savefig("output/phases1.png")
 
 
 def exercise2(method=euler):
+    fig_ph, axs = plt.subplots(3, 2)
     for i, alpha in enumerate([0.5, 5, 201]):
-        exercise(method, alpha, dt=0.01, subdir=f"ex2/{i}")
+        exercise(method, alpha, dt=0.01, subdir=f"ex2/{i}", ph=axs[i])
+    fig_ph.tight_layout()
+    fig_ph.savefig("output/phases2.png")
 
 
 def main():
