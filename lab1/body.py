@@ -17,25 +17,30 @@ class Body:
         self.v0 = v0
 
     def get_next_x_euler(self) -> float:
+        """
+        Calculates next position with euler method
+        """
         output = self.x + self.v * self.dt
         return output
 
     def get_next_v_euler(self) -> float:
+        """
+        Calculates next velocity with euler method
+        """
         output = self.v - 1 / self.mass * \
             derivative(V, self.x) * self.dt - self.alpha * self.v * self.dt
         return output
 
     def get_next_euler(self) -> Tuple[float, float]:
+        """
+        Return tuple of next position and velocity
+        """
         return self.get_next_x_euler(), self.get_next_v_euler()
 
-    def reset_data(self):
-        self.x = self.x0
-        self.v = self.v0
-        self.past_positions = [self.x]
-        self.past_velocities = [self.v]
-        self.past_times = [0]
-
     def calculate_euler(self, range: float):
+        """
+        Computes array of positions, velovities and energies with euler method
+        """
         t = 0
         print("[INFO]::Calculating Euler...")
         while t <= range:
