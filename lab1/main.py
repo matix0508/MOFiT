@@ -1,9 +1,7 @@
-from body import Body
-from typing import List
 from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
-from constants import M, x_0, v_0
 from euler import euler
+from trapezoid import trapezoid
 
 plt.rcParams.update({
     "text.usetex": True,
@@ -20,6 +18,9 @@ def exercise(method, alpha, dt, subdir, ph: Axes = None):
 
 
 def exercise1(method=euler):
+    """
+    Function that handles exercise with alpha=0
+    """
     fig_ph, axs = plt.subplots(2, 2)
     for i, dt in enumerate([0.01, 0.001]):
         exercise(method, alpha=0, dt=dt, subdir=f"ex1/{i}", ph=axs[i])
@@ -28,6 +29,9 @@ def exercise1(method=euler):
 
 
 def exercise2(method=euler):
+    """
+    Function that handles exercise with non zero alpha
+    """
     fig_ph, axs = plt.subplots(3, 2)
     for i, alpha in enumerate([0.5, 5, 201]):
         exercise(method, alpha, dt=0.01, subdir=f"ex2/{i}", ph=axs[i])
@@ -36,8 +40,13 @@ def exercise2(method=euler):
 
 
 def main():
-    exercise1()
-    exercise2()
+    """
+    Main Function
+    """
+    # exercise1()
+    # exercise2()
+    exercise1(trapezoid)
+    exercise2(trapezoid)
 
 
 if __name__ == "__main__":

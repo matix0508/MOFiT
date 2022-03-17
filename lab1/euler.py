@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from body import Body
-from utils import plot_group
+from plots import plot_group
 from constants import M, x_0, v_0
 
 
