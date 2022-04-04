@@ -85,6 +85,7 @@ class Solver:
 
 class Euler(Solver):
     """Solver for Euler's method"""
+
     def __init__(self, tmax: int, dt: float, alpha: float, mass: float = M):
         super().__init__(tmax, dt, alpha, mass)
 
@@ -109,6 +110,7 @@ class Euler(Solver):
 
 class Trapezoid(Solver):
     """Solver for Trapezoid's method"""
+
     def __init__(self, tmax: int, dt: float, alpha: float, mass: float = M):
         super().__init__(tmax, dt, alpha, mass)
 
@@ -175,6 +177,7 @@ class Trapezoid(Solver):
 
 class Plotter:
     """Class for plotting the trajectory of the body"""
+
     def __init__(self, solver: Union[Euler, Trapezoid], dir: str):
         self.solver = solver
         self.dir = dir
@@ -230,11 +233,12 @@ class Plotter:
 
 class Handler:
     """Class for handling high level logic of the program"""
+
     def __init__(self):
         self.dir: str = "images"
 
     def exercise(self, S: type, dt: float, alpha: float, dir: os.path, save: bool = False):
-        """method representing single exercise (or subexercise)""" 
+        """method representing single exercise (or subexercise)"""
         tmax = 30
         solver: Union[Euler, Trapezoid] = S(tmax, dt, alpha)
         solver.calculate(save=save)
