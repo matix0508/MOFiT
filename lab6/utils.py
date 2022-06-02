@@ -34,14 +34,20 @@ def get_vortocity(y, Q):
 
 def get_obsticle() -> np.ndarray:
     output = np.zeros((WIDTH, HEIGHT))
-    x0 = inv_x_loc(-Ik)
-    xk = inv_x_loc(Ik)
+    x0 = inv_x_loc(-Ik-1)
+    xk = inv_x_loc(Ik+1)
     y0 = inv_y_loc(-40)
-    yk = inv_y_loc(Jk)
+    yk = inv_y_loc(Jk+1)
     output[x0:xk, y0:yk] = 1
     return output
 
-def plot_grid(data):
-    plt.imshow(data.T, origin="lower")
+def plot_grid(data, title: str = ""):
+    grid = data.T - get_obsticle().T * data.T
+    plt.imshow(grid, origin="lower")
+    plt.contour(grid, levels=10)
     plt.colorbar()
+    plt.title(title)
     plt.show()
+
+def is_in_obsticle(i, j):
+    return get_obsticle()[i,j] == 1
