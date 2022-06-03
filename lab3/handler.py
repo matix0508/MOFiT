@@ -69,7 +69,7 @@ class Hanlder:
         for w_i in w:
             s = String(100, False, 1, x0, w_i, initial=zero)
             print(f"w: {int(w_i/3.14)}")
-            s.calculate(f"resonance{int(w_i/3.14)}_{x0}", False)
+            s.calculate(f"resonance{int(w_i/3.14)}_{x0}")
             self.solvers['resonance'].append(s)
             E.append(s.average_energy(16, 20))
             if animate:
@@ -78,7 +78,10 @@ class Hanlder:
                 self.animations['resonance'].append(a)
         print(E)
         plt.clf()
-        plt.plot(w, E)
+        plt.scatter(w, E)
+        plt.xlabel("w")
+        plt.ylabel("E")
+        plt.title(f"Resonance x0 = {x0}")
         plt.savefig(f"output/E(w)_{x0}.png")
         
 

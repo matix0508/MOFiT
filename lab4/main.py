@@ -18,6 +18,14 @@ def main():
     grid.save_to_file("output/grid")
     plotter = Plotter(grid)
     plotter.plot_all()
+    # grid2k = Grid(N,iterations=2000)
+    # if os.path.exists('output/grid2k.npy'):
+    #     grid2k.load_from_file('output/grid2k')
+    # else:
+    #     grid2k.calculate()
+    #     grid2k.save_to_file("output/grid2k")
+    # plotter = Plotter(grid2k)
+    # plotter.plot_rho_diff("rho_diff2k")
 
     iters = []
     w_arr = np.linspace(1, 2, 50)
@@ -43,7 +51,9 @@ def main():
     grid_final.save_to_file('output/grid_final')
     plotter = Plotter(grid_final)
     plotter.plot_all("final")
-    print(f"Final w is: {w_arr[iters.argmin()]}")
+    w_opt = w_arr[iters.argmin()]
+    print(f"Final w is: {w_opt}")
+
 
 if __name__ == "__main__":
     main()

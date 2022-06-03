@@ -1,4 +1,4 @@
 COLS = 201
-ROWS = 101
+ROWS = 151
 DX = 1 
 DY = 1 

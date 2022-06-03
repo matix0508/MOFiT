@@ -50,6 +50,7 @@ class Grid:
         print("Filled rho")
         print("starting iterations")
         for i in range(self.iterations):
+            print("Iteration: ", i)
             self.fill()
             self.a_arr.append(self.get_a())
             if self.search_w:
