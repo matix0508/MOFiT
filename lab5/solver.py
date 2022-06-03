@@ -53,7 +53,7 @@ class Solver:
             self.grid[i, j] = 0.25 * (self.grid[i+1, j] + self.grid[i-1, j] + self.grid[i, j+1] + self.grid[i, j-1] )
 
     def calculate(self, name: str):
-        for num in range(1000):
+        for num in range(400):
             print(num)
             if name == "potential":
                 self.potential_conditions()
