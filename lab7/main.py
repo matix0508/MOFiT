@@ -1,4 +1,5 @@
 import os
+from turtle import color
 from matplotlib import pyplot as plt
 import numpy as np
 from utils import plot_moments
@@ -44,7 +45,9 @@ def ex2():
         Ep = np.load("energy.npy")
 
     
-    plt.plot(Ep)
+    plt.plot(l_arr, Ep)
+    plt.hlines([0.5], 0, l_arr[-1], linestyles="dashed", color="red")
+    plt.savefig("energy.png")
     plt.show()
 
 
